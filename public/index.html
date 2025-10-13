@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkateHubba™ | Own Your Tricks</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <img src="https://skatehubba.com/logo.png" alt="SkateHubba Logo" class="logo" />
+    <h1>Own Your Tricks</h1>
+    <p>The first real-world skate app connecting spots, skaters, and style.</p>
+
+    <form id="subscribe-form">
+      <input type="text" name="firstName" placeholder="First name (optional)" />
+      <input type="email" name="email" placeholder="Your email" required />
+      <button type="submit">Join Beta</button>
+    </form>
+
+    <p id="response" class="msg"></p>
+  </main>
+
+  <script>
+    document.getElementById('subscribe-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      document.getElementById('response').textContent = json.msg || 'Thanks for signing up!';
+    });
+  </script>
+</body>
+</html>
