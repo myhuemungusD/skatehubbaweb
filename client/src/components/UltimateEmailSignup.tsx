@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { useToast } from '../hooks/use-toast';
@@ -28,6 +28,10 @@ interface UltimateEmailSignupProps {
   onSuccess?: (data: { email: string; firstName?: string; status: string }) => void;
   /** Custom styling classes */
   className?: string;
+  /** Prefill email when the component mounts or the value changes */
+  defaultEmail?: string;
+  /** Prefill first name when the component mounts or the value changes */
+  defaultFirstName?: string;
 }
 
 export default function UltimateEmailSignup({ 
@@ -37,7 +41,9 @@ export default function UltimateEmailSignup({
   showSocialProof = true,
   source = 'unknown',
   onSuccess,
-  className = ''
+  className = '',
+  defaultEmail,
+  defaultFirstName
 }: UltimateEmailSignupProps) {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -45,6 +51,7 @@ export default function UltimateEmailSignup({
   const [isSuccess, setIsSuccess] = useState(false);
   const [validationError, setValidationError] = useState('');
   const { toast } = useToast();
+  const lastPrefill = useRef<{ email?: string; firstName?: string }>({});
 
   // Social proof counter (simulated for demo)
   const [subscriberCount, setSubscriberCount] = useState(1247);
@@ -58,6 +65,26 @@ export default function UltimateEmailSignup({
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (defaultEmail !== undefined && defaultEmail !== lastPrefill.current.email) {
+      setEmail(defaultEmail);
+      setIsSuccess(false);
+      lastPrefill.current.email = defaultEmail;
+    }
+  }, [defaultEmail]);
+
+  useEffect(() => {
+    if (!includeFirstName) {
+      return;
+    }
+
+    if (defaultFirstName !== undefined && defaultFirstName !== lastPrefill.current.firstName) {
+      setFirstName(defaultFirstName);
+      setIsSuccess(false);
+      lastPrefill.current.firstName = defaultFirstName;
+    }
+  }, [defaultFirstName, includeFirstName]);
 
   const getVariantStyles = () => {
     switch (variant) {

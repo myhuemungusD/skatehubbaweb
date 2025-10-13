@@ -1,12 +1,12 @@
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import Background from "../components/BackgroundCarousel";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { useToast } from "../hooks/use-toast";
 import { analytics } from "../lib/analytics";
 import { z } from "zod";
-import { ChevronDown, Play, CheckCircle, Zap, MapPin, Users, Trophy } from "lucide-react";
+import { CheckCircle, Zap, MapPin, Users, Trophy, Menu, X } from "lucide-react";
 
 const subscribeSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -94,6 +94,8 @@ const SkateHubbaLogo = () => (
 
 export default function UnifiedLanding() {
   const [showDetailedFeatures, setShowDetailedFeatures] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [, setLocation] = useLocation();
   
   // VHS Glitch Effect on Beta Button
   useEffect(() => {
@@ -185,24 +187,85 @@ export default function UnifiedLanding() {
 
           {/* Social Proof Indicators */}
           <div className="flex justify-center items-center gap-8 mb-12 text-sm text-gray-400">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-orange-500" />
-              <span>Join 1,000+ skaters</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              <span>Free beta access</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-yellow-500" />
-              <span>Mint your moments</span>
-            </div>
-          </div>
-
-          {/* Primary Auth Button */}
-          <div className="text-center">
-            <Link to="/auth">
+            <div className="hidden md:flex items-center space-x-6">
               <button 
+                onClick={() => {
+                  setShowDetailedFeatures((prev) => {
+                    const next = !prev;
+                    if (!prev) {
+                      requestAnimationFrame(() => {
+                        document.getElementById('detailed-features')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      });
+                    }
+                    return next;
+                  });
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium"
+                data-testid="button-features-toggle"
+              >
+                Features
+              </button>
+              <Button 
+                onClick={() => {
+                  setLocation('/donate');
+                  setIsMobileMenuOpen(false);
+                }}
+                size="sm"
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105"
+                data-testid="button-donate-nav"
+              >
+                Donate
+              </Button>
+            </div>
+            <button
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-700 text-gray-200 transition-colors duration-200 hover:bg-gray-900/80"
+              aria-label="Toggle navigation"
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+              <button 
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-gray-800/60 py-4 space-y-3">
+              <button
+                onClick={() => {
+                  setShowDetailedFeatures((prev) => {
+                    const next = !prev;
+                    if (!prev) {
+                      requestAnimationFrame(() => {
+                        document.getElementById('detailed-features')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      });
+                    }
+                    return next;
+                  });
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-gray-200 transition-colors duration-200 hover:bg-gray-900/80"
+                data-testid="button-features-toggle-mobile"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => {
+                  setLocation('/donate');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full rounded-lg bg-green-500 px-3 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-green-600"
+                data-testid="button-donate-nav-mobile"
+              >
+                Donate
+              </button>
+              <Link to="/auth">
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="mt-1 block w-full rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition-colors duration-200 hover:bg-gray-900/80"
+                >
+                  Sign In
+                </button>
+              </Link>
+            </div>
+          )}
                 className="auth-button"
                 data-testid="button-auth-primary"
               >
@@ -230,7 +293,7 @@ export default function UnifiedLanding() {
 
       {/* Expandable Detailed Features */}
       {showDetailedFeatures && (
-        <Section className="bg-gradient-to-br from-orange-500/10 to-purple-600/10 border-y border-orange-400/20 fade-in-section">
+        <Section id="detailed-features" className="bg-gradient-to-br from-orange-500/10 to-purple-600/10 border-y border-orange-400/20 fade-in-section">
           <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
               More Than Just an App
